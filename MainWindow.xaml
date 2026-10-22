@@ -1,0 +1,1043 @@
+﻿<Window x:Class="TWM.Installer.MainWindow"
+        Icon="Resources/twm_installer.ico"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="TWM Installer"
+        Width="1120"
+        Height="700"
+        MinWidth="1100"
+        MinHeight="700"
+        MaxWidth="1440"
+        MaxHeight="900"
+        WindowStyle="None"
+        ResizeMode="CanResize"
+        Background="#090A0D"
+        Foreground="#F2F3F5"
+        FontFamily="Segoe UI"
+        WindowStartupLocation="CenterScreen"
+        AllowsTransparency="False"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True"
+        TextOptions.TextFormattingMode="Display"
+        TextOptions.TextRenderingMode="ClearType">
+
+    <Window.RenderTransform>
+        <TranslateTransform Y="0"/>
+    </Window.RenderTransform>
+
+    <Window.Resources>
+        <!-- Premium Silver palette -->
+        <SolidColorBrush x:Key="Silver" Color="#A7ADB6"/>
+        <SolidColorBrush x:Key="SilverLight" Color="#E5E8ED"/>
+        <SolidColorBrush x:Key="Panel" Color="#111318"/>
+        <SolidColorBrush x:Key="PanelLight" Color="#171A20"/>
+        <SolidColorBrush x:Key="Muted" Color="#858B96"/>
+        <SolidColorBrush x:Key="BorderBrush" Color="#292D35"/>
+        <SolidColorBrush x:Key="TextPrimary" Color="#F2F3F5"/>
+        <SolidColorBrush x:Key="TextSecondary" Color="#B1B7C1"/>
+
+        <!-- Кнопка управления окном -->
+        <Style x:Key="WindowButton" TargetType="Button">
+            <Setter Property="Width" Value="46"/>
+            <Setter Property="Height" Value="42"/>
+            <Setter Property="Foreground" Value="#AEB4BE"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Focusable" Value="False"/>
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Root"
+                                Background="{TemplateBinding Background}">
+                            <ContentPresenter
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                TextElement.Foreground="{TemplateBinding Foreground}"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard HandoffBehavior="SnapshotAndReplace">
+                                        <Storyboard>
+                                            <ColorAnimation
+                                                Storyboard.TargetName="Root"
+                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                To="#252932"
+                                                Duration="0:0:0.16"/>
+                                            <ColorAnimation
+                                                Storyboard.TargetProperty="Foreground.(SolidColorBrush.Color)"
+                                                To="#FFFFFF"
+                                                Duration="0:0:0.16"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard HandoffBehavior="SnapshotAndReplace">
+                                        <Storyboard>
+                                            <ColorAnimation
+                                                Storyboard.TargetName="Root"
+                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                To="#00000000"
+                                                Duration="0:0:0.16"/>
+                                            <ColorAnimation
+                                                Storyboard.TargetProperty="Foreground.(SolidColorBrush.Color)"
+                                                To="#AEB4BE"
+                                                Duration="0:0:0.16"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Root"
+                                        Property="Opacity"
+                                        Value="0.7"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Кнопка закрытия окна -->
+        <Style x:Key="CloseWindowButton"
+               TargetType="Button"
+               BasedOn="{StaticResource WindowButton}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Root"
+                                Background="{TemplateBinding Background}">
+                            <ContentPresenter
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                TextElement.Foreground="{TemplateBinding Foreground}"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard HandoffBehavior="SnapshotAndReplace">
+                                        <Storyboard>
+                                            <ColorAnimation
+                                                Storyboard.TargetName="Root"
+                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                To="#512B32"
+                                                Duration="0:0:0.16"/>
+                                            <ColorAnimation
+                                                Storyboard.TargetProperty="Foreground.(SolidColorBrush.Color)"
+                                                To="#FFFFFF"
+                                                Duration="0:0:0.16"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard HandoffBehavior="SnapshotAndReplace">
+                                        <Storyboard>
+                                            <ColorAnimation
+                                                Storyboard.TargetName="Root"
+                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                To="#00000000"
+                                                Duration="0:0:0.16"/>
+                                            <ColorAnimation
+                                                Storyboard.TargetProperty="Foreground.(SolidColorBrush.Color)"
+                                                To="#AEB4BE"
+                                                Duration="0:0:0.16"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Root"
+                                        Property="Opacity"
+                                        Value="0.7"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Основная кнопка с плавной анимацией -->
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="Height" Value="48"/>
+            <Setter Property="MinWidth" Value="190"/>
+            <Setter Property="Padding" Value="22,0"/>
+            <Setter Property="Foreground" Value="#111318"/>
+            <Setter Property="Background" Value="#DDE1E7"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#F1F3F6"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Root"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}"
+                                RenderTransformOrigin="0.5,0.5">
+
+                            <Border.RenderTransform>
+                                <ScaleTransform ScaleX="1"
+                                                ScaleY="1"/>
+                            </Border.RenderTransform>
+
+                            <ContentPresenter
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                RecognizesAccessKey="True"
+                                TextElement.Foreground="{TemplateBinding Foreground}"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Root"
+                                        Property="Background"
+                                        Value="#FFFFFF"/>
+                                <Setter TargetName="Root"
+                                        Property="BorderBrush"
+                                        Value="#FFFFFF"/>
+
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard HandoffBehavior="SnapshotAndReplace">
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="Root"
+                                                Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                                To="1.015"
+                                                Duration="0:0:0.14">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="Root"
+                                                Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                                To="1.015"
+                                                Duration="0:0:0.14">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard HandoffBehavior="SnapshotAndReplace">
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="Root"
+                                                Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                                To="1"
+                                                Duration="0:0:0.12">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="Root"
+                                                Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                                To="1"
+                                                Duration="0:0:0.12">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Root"
+                                        Property="Background"
+                                        Value="#C5CBD4"/>
+                                <Setter TargetName="Root"
+                                        Property="BorderBrush"
+                                        Value="#C5CBD4"/>
+                                <Setter TargetName="Root"
+                                        Property="Opacity"
+                                        Value="0.78"/>
+                            </Trigger>
+
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Root"
+                                        Property="Opacity"
+                                        Value="0.42"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Второстепенная кнопка -->
+        <Style x:Key="SecondaryButton"
+               TargetType="Button"
+               BasedOn="{StaticResource PrimaryButton}">
+            <Setter Property="Height" Value="42"/>
+            <Setter Property="MinWidth" Value="150"/>
+            <Setter Property="Foreground" Value="#D0D4DB"/>
+            <Setter Property="Background" Value="#171A20"/>
+            <Setter Property="BorderBrush" Value="#383D47"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Root"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                RecognizesAccessKey="True"
+                                TextElement.Foreground="{TemplateBinding Foreground}"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Root"
+                                        Property="Background"
+                                        Value="#303640"/>
+                                <Setter TargetName="Root"
+                                        Property="BorderBrush"
+                                        Value="#A7ADB6"/>
+                                <Setter Property="Foreground"
+                                        Value="#FFFFFF"/>
+                            </Trigger>
+
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Root"
+                                        Property="Opacity"
+                                        Value="0.75"/>
+                            </Trigger>
+
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Root"
+                                        Property="Opacity"
+                                        Value="0.4"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Отдельный стиль для удаления -->
+        <Style x:Key="DangerButton"
+               TargetType="Button"
+               BasedOn="{StaticResource SecondaryButton}">
+            <Setter Property="Foreground" Value="#B5BBC5"/>
+            <Setter Property="BorderBrush" Value="#343943"/>
+            <Setter Property="MinWidth" Value="0"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="Height" Value="42"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+
+        <Style x:Key="SectionLabel" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{StaticResource Silver}"/>
+            <Setter Property="TextOptions.TextFormattingMode" Value="Ideal"/>
+        </Style>
+
+        <Style x:Key="SmallMutedText" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="{StaticResource Muted}"/>
+            <Setter Property="TextOptions.TextFormattingMode" Value="Ideal"/>
+        </Style>
+    </Window.Resources>
+
+    <!-- Анимация появления окна -->
+    <Window.Triggers>
+        <EventTrigger RoutedEvent="Window.Loaded">
+            <BeginStoryboard>
+                <Storyboard>
+                    <DoubleAnimation
+                        Storyboard.TargetProperty="Opacity"
+                        From="0"
+                        To="1"
+                        Duration="0:0:0.35"/>
+
+                    <DoubleAnimation
+                        Storyboard.TargetProperty="(Window.RenderTransform).(TranslateTransform.Y)"
+                        From="10"
+                        To="0"
+                        Duration="0:0:0.35">
+                        <DoubleAnimation.EasingFunction>
+                            <CubicEase EasingMode="EaseOut"/>
+                        </DoubleAnimation.EasingFunction>
+                    </DoubleAnimation>
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+    </Window.Triggers>
+
+    <Border BorderBrush="#343943"
+            BorderThickness="1"
+            CornerRadius="10"
+            Background="#090A0D"
+            ClipToBounds="True">
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="46"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="38"/>
+            </Grid.RowDefinitions>
+
+            <!-- Верхняя панель -->
+            <Border Grid.Row="0"
+                    Background="#0E1014"
+                    BorderBrush="#262A32"
+                    BorderThickness="0,0,0,1"
+                    MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Orientation="Horizontal"
+                                VerticalAlignment="Center"
+                                Margin="20,0,0,0">
+
+                        <Border Width="27"
+                                Height="27"
+                                CornerRadius="6"
+                                Background="#1B1F26"
+                                BorderBrush="#626A77"
+                                BorderThickness="1">
+                            <TextBlock Text="T"
+                                       FontSize="16"
+                                       FontWeight="Bold"
+                                       Foreground="#E5E8ED"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+
+                        <StackPanel VerticalAlignment="Center"
+                                    Margin="10,0,0,0">
+                            <TextBlock Text="TWM"
+                                       FontSize="12"
+                                       FontWeight="Bold"
+                                       Foreground="#F0F2F5"/>
+                            <TextBlock Text="INSTALLER"
+                                       FontSize="9"
+                                       FontWeight="SemiBold"
+                                       Foreground="#8D949F"
+                                       Margin="0,-1,0,0"/>
+                        </StackPanel>
+
+                        <Border Width="1"
+                                Height="20"
+                                Background="#30343D"
+                                Margin="17,0"/>
+
+                        <TextBlock Text="DESKTOP CLIENT"
+                                   FontSize="9"
+                                   FontWeight="SemiBold"
+                                   Foreground="#737B87"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal">
+                        <Button Style="{StaticResource WindowButton}"
+                                Content="—"
+                                Click="Minimize_Click"/>
+                        <Button Style="{StaticResource CloseWindowButton}"
+                                Content="×"
+                                FontSize="21"
+                                Click="Close_Click"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Основное содержимое -->
+            <Grid Grid.Row="1" Margin="30,24,30,22">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.08*"/>
+                    <ColumnDefinition Width="0.92*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Левая колонка -->
+                <Grid Grid.Column="0" Margin="0,0,24,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0"
+                                VerticalAlignment="Top">
+
+                        <!-- Бейдж: появляется первым -->
+                        <Border HorizontalAlignment="Left"
+                                MaxWidth="460"
+                                CornerRadius="4"
+                                BorderBrush="#3C424D"
+                                BorderThickness="1"
+                                Padding="10,7"
+                                Background="#13161C"
+                                Opacity="0"
+                                RenderTransformOrigin="0.5,0.5">
+
+                            <Border.RenderTransform>
+                                <TranslateTransform Y="8"/>
+                            </Border.RenderTransform>
+
+                            <Border.Triggers>
+                                <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Storyboard.TargetProperty="Opacity"
+                                                From="0"
+                                                To="1"
+                                                Duration="0:0:0.3">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+
+                                            <DoubleAnimation
+                                                Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                                                From="8"
+                                                To="0"
+                                                Duration="0:0:0.3">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Border.Triggers>
+
+                            <StackPanel Orientation="Horizontal">
+                                <Ellipse Width="6"
+                                         Height="6"
+                                         Fill="#C7CDD6"
+                                         VerticalAlignment="Center"/>
+
+                                <TextBlock Text="OFFICIAL DESKTOP CLIENT"
+                                           FontSize="11"
+                                           FontWeight="SemiBold"
+                                           Foreground="#C2C7D0"
+                                           VerticalAlignment="Center"
+                                           Margin="8,0,0,0"
+                                           TextWrapping="NoWrap"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Заголовок TWM / LAUNCHER -->
+                        <StackPanel x:Name="HeroTitleBlock"
+                                    Opacity="0"
+                                    RenderTransformOrigin="0.5,0.5">
+
+                            <StackPanel.RenderTransform>
+                                <TranslateTransform Y="12"/>
+                            </StackPanel.RenderTransform>
+
+                            <StackPanel.Triggers>
+                                <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                    <BeginStoryboard>
+                                        <Storyboard BeginTime="0:0:0.12">
+                                            <DoubleAnimation
+                                                Storyboard.TargetProperty="Opacity"
+                                                From="0"
+                                                To="1"
+                                                Duration="0:0:0.4">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+
+                                            <DoubleAnimation
+                                                Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                                                From="12"
+                                                To="0"
+                                                Duration="0:0:0.4">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </StackPanel.Triggers>
+
+                            <TextBlock Text="TWM"
+                                       FontSize="68"
+                                       FontWeight="Bold"
+                                       Foreground="#F3F4F6"
+                                       Margin="-5,18,0,-3"/>
+
+                            <TextBlock Text="LAUNCHER"
+                                       FontSize="22"
+                                       FontWeight="Light"
+                                       Foreground="#A7ADB6"
+                                       Margin="2,0,0,0"/>
+                        </StackPanel>
+
+                        <!-- Разделительная линия и описание -->
+                        <StackPanel x:Name="HeroDescriptionBlock"
+                                    Opacity="0"
+                                    RenderTransformOrigin="0.5,0.5">
+
+                            <StackPanel.RenderTransform>
+                                <TranslateTransform Y="10"/>
+                            </StackPanel.RenderTransform>
+
+                            <StackPanel.Triggers>
+                                <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                    <BeginStoryboard>
+                                        <Storyboard BeginTime="0:0:0.28">
+                                            <DoubleAnimation
+                                                Storyboard.TargetProperty="Opacity"
+                                                From="0"
+                                                To="1"
+                                                Duration="0:0:0.4">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+
+                                            <DoubleAnimation
+                                                Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                                                From="10"
+                                                To="0"
+                                                Duration="0:0:0.4">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </StackPanel.Triggers>
+
+                            <Border Width="74"
+                                    Height="2"
+                                    HorizontalAlignment="Left"
+                                    Background="#A7ADB6"
+                                    Margin="3,20,0,18"/>
+
+                            <TextBlock Text="Твой игровой мир начинается здесь."
+                                       FontSize="15"
+                                       FontWeight="SemiBold"
+                                       Foreground="#E0E3E8"
+                                       TextWrapping="Wrap"/>
+
+                            <TextBlock Text="Установи клиент и возвращайся в игру."
+                                       FontSize="12"
+                                       Foreground="#8E95A0"
+                                       TextWrapping="Wrap"
+                                       Margin="0,8,0,0"/>
+                        </StackPanel>
+
+                        <!-- Отображается, если клиент не найден -->
+                        <Button x:Name="InstallButton"
+                                Content="УСТАНОВИТЬ КЛИЕНТ     →"
+                                Style="{StaticResource PrimaryButton}"
+                                HorizontalAlignment="Left"
+                                Margin="0,25,0,0"
+                                Click="Install_Click"
+                                Opacity="0"
+                                RenderTransformOrigin="0.5,0.5">
+
+                            <Button.RenderTransform>
+                                <TranslateTransform Y="10"/>
+                            </Button.RenderTransform>
+
+                            <Button.Triggers>
+                                <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                    <BeginStoryboard>
+                                        <Storyboard BeginTime="0:0:0.48">
+                                            <DoubleAnimation
+                                                Storyboard.TargetProperty="Opacity"
+                                                From="0"
+                                                To="1"
+                                                Duration="0:0:0.35">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+
+                                            <DoubleAnimation
+                                                Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                                                From="10"
+                                                To="0"
+                                                Duration="0:0:0.35">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Button.Triggers>
+                        </Button>
+
+                        <!-- Отображается, если клиент установлен -->
+                        <StackPanel x:Name="InstalledPanel"
+                                    Visibility="Collapsed"
+                                    Margin="0,20,0,0">
+
+                            <Border Background="#151920"
+                                    BorderBrush="#414854"
+                                    BorderThickness="1"
+                                    CornerRadius="6"
+                                    Padding="12,10">
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Border Width="30"
+                                            Height="30"
+                                            CornerRadius="15"
+                                            Background="#252B33"
+                                            BorderBrush="#606977"
+                                            BorderThickness="1"
+                                            VerticalAlignment="Center">
+                                        <TextBlock Text="✓"
+                                                   FontSize="16"
+                                                   Foreground="#E0E4EA"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"/>
+                                    </Border>
+
+                                    <StackPanel Grid.Column="1"
+                                                Margin="10,0,0,0"
+                                                VerticalAlignment="Center">
+                                        <TextBlock Text="TWM LAUNCHER"
+                                                   FontSize="11"
+                                                   FontWeight="Bold"
+                                                   Foreground="#E8EBEF"/>
+                                        <TextBlock Text="Клиент установлен"
+                                                   FontSize="11"
+                                                   Foreground="#A7ADB6"
+                                                   Margin="0,3,0,0"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <TextBlock Text="ПАПКА УСТАНОВКИ"
+                                       Style="{StaticResource SectionLabel}"
+                                       Margin="1,14,0,6"/>
+
+                            <Border Background="#101319"
+                                    BorderBrush="#2D323B"
+                                    BorderThickness="1"
+                                    CornerRadius="5"
+                                    Padding="12,10"
+                                    MinHeight="42">
+
+                                <Grid>
+                                    <TextBlock x:Name="InstallationPathText"
+                                               FontSize="12"
+                                               Foreground="#C0C6D0"
+                                               HorizontalAlignment="Stretch"
+                                               VerticalAlignment="Center"
+                                               TextAlignment="Left"
+                                               TextTrimming="CharacterEllipsis"
+                                               TextWrapping="NoWrap"
+                                               ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}"/>
+                                </Grid>
+                            </Border>
+
+                            <Button x:Name="OpenLauncherButton"
+                                    Content="ЗАПУСТИТЬ ЛАУНЧЕР    →"
+                                    Style="{StaticResource PrimaryButton}"
+                                    HorizontalAlignment="Stretch"
+                                    Margin="0,12,0,0"
+                                    Click="OpenLauncher_Click"/>
+
+                            <Button x:Name="UninstallButton"
+                                    Content="УДАЛИТЬ КЛИЕНТ"
+                                    Style="{StaticResource DangerButton}"
+                                    HorizontalAlignment="Stretch"
+                                    Margin="0,7,0,0"
+                                    Click="Uninstall_Click"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Поддерживаемые системы -->
+                    <StackPanel Grid.Row="1"
+                                Orientation="Horizontal"
+                                Margin="1,12,0,0">
+                        <Border Width="4"
+                                Height="4"
+                                CornerRadius="2"
+                                Background="#9299A4"
+                                VerticalAlignment="Center"/>
+                        <TextBlock Text="  WINDOWS 10 / 11"
+                                   FontSize="10"
+                                   FontWeight="SemiBold"
+                                   Foreground="#777F8B"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Text="  •  x64"
+                                   FontSize="10"
+                                   Foreground="#777F8B"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Правая информационная панель -->
+                <Border Grid.Column="1"
+                        Background="#101217"
+                        BorderBrush="#30343D"
+                        BorderThickness="1"
+                        CornerRadius="9">
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Заголовок панели -->
+                        <StackPanel Grid.Row="0" Margin="20,19,20,0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Text="INSTALLATION"
+                                           Style="{StaticResource SectionLabel}"
+                                           VerticalAlignment="Center"/>
+
+                                <Border Grid.Column="1"
+                                        Background="#1A1E25"
+                                        BorderBrush="#363C46"
+                                        BorderThickness="1"
+                                        CornerRadius="4"
+                                        Padding="7,4">
+                                    <TextBlock Text="TWM  /  01"
+                                               FontSize="10"
+                                               FontWeight="SemiBold"
+                                               Foreground="#AEB5C0"/>
+                                </Border>
+                            </Grid>
+
+                            <TextBlock Text="Всё готово к старту"
+                                       FontSize="20"
+                                       FontWeight="SemiBold"
+                                       Foreground="#EDF0F4"
+                                       Margin="0,15,0,0"/>
+
+                            <TextBlock Text="Установка игрового клиента без лишних действий."
+                                       FontSize="12"
+                                       Foreground="#9299A4"
+                                       TextWrapping="Wrap"
+                                       Margin="0,7,0,0"/>
+                        </StackPanel>
+
+                        <!-- Центральная эмблема с анимацией появления -->
+                        <Grid Grid.Row="1"
+                              x:Name="Emblem"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
+                              Width="220"
+                              Height="220"
+                              Opacity="0"
+                              RenderTransformOrigin="0.5,0.5">
+
+                            <Grid.RenderTransform>
+                                <ScaleTransform ScaleX="0.94"
+                                                ScaleY="0.94"/>
+                            </Grid.RenderTransform>
+
+                            <Grid.Triggers>
+                                <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                    <BeginStoryboard HandoffBehavior="SnapshotAndReplace">
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Storyboard.TargetProperty="Opacity"
+                                                From="0"
+                                                To="1"
+                                                Duration="0:0:0.45">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+
+                                            <DoubleAnimation
+                                                Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                                From="0.94"
+                                                To="1"
+                                                Duration="0:0:0.45">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+
+                                            <DoubleAnimation
+                                                Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                                From="0.94"
+                                                To="1"
+                                                Duration="0:0:0.45">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Grid.Triggers>
+
+                            <Ellipse Stroke="#222730"
+                                     StrokeThickness="1"/>
+
+                            <Ellipse Margin="13"
+                                     Stroke="#2C323C"
+                                     StrokeThickness="1"/>
+
+                            <Ellipse Margin="27"
+                                     Stroke="#3A414D"
+                                     StrokeThickness="1"
+                                     Opacity="0.9"/>
+
+                            <Ellipse Margin="42"
+                                     Stroke="#525B69"
+                                     StrokeThickness="1"
+                                     Opacity="0.7"/>
+
+                            <Ellipse Width="100"
+                                     Height="100"
+                                     Fill="#1C2027"
+                                     Stroke="#A7ADB6"
+                                     StrokeThickness="1.2"/>
+
+                            <Ellipse Width="82"
+                                     Height="82"
+                                     Stroke="#343B46"
+                                     StrokeThickness="1"/>
+
+                            <TextBlock Text="T"
+                                       FontSize="60"
+                                       FontWeight="Bold"
+                                       Foreground="#E5E8ED"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Margin="0,-5,0,0"/>
+
+                            <Border Width="7"
+                                    Height="7"
+                                    CornerRadius="4"
+                                    Background="#DDE1E7"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Top"/>
+                        </Grid>
+
+                        <!-- Нижняя часть панели -->
+                        <StackPanel Grid.Row="2" Margin="20,0,20,18">
+                            <Border Height="1"
+                                    Background="#2B3039"
+                                    Margin="0,0,0,15"/>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel>
+                                    <TextBlock Text="INSTALLER STATUS"
+                                               FontSize="11"
+                                               FontWeight="SemiBold"
+                                               Foreground="#858D99"/>
+                                    <TextBlock Text="Локальный установщик"
+                                               FontSize="11"
+                                               Foreground="#C0C5CE"
+                                               Margin="0,4,0,0"/>
+                                </StackPanel>
+
+                                <Border Grid.Column="1"
+                                        Background="#1A1E25"
+                                        BorderBrush="#3B424D"
+                                        BorderThickness="1"
+                                        CornerRadius="5"
+                                        Padding="9,6"
+                                        VerticalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Ellipse Width="6"
+                                                 Height="6"
+                                                 Fill="#DDE1E7"
+                                                 VerticalAlignment="Center"/>
+                                        <TextBlock Text="READY"
+                                                   FontSize="10"
+                                                   FontWeight="Bold"
+                                                   Foreground="#E5E8ED"
+                                                   VerticalAlignment="Center"
+                                                   Margin="7,0,0,0"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- Нижняя строка -->
+            <Border Grid.Row="2"
+                    Background="#0E1014"
+                    BorderBrush="#262A32"
+                    BorderThickness="0,1,0,0">
+
+                <Grid Margin="20,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Orientation="Horizontal"
+                                VerticalAlignment="Center">
+                        <TextBlock Text="TWM"
+                                   FontSize="9"
+                                   FontWeight="Bold"
+                                   Foreground="#B7BDC7"/>
+                        <TextBlock Text="  •  COMMUNITY CLIENT"
+                                   FontSize="9"
+                                   Foreground="#747C88"/>
+                    </StackPanel>
+
+                    <TextBlock Grid.Column="1"
+                               Text="PREMIUM SILVER"
+                               FontSize="9"
+                               FontWeight="SemiBold"
+                               Foreground="#747C88"
+                               VerticalAlignment="Center"/>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

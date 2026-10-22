@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+<PropertyGroup>
+  <OutputType>WinExe</OutputType>
+  <TargetFramework>net10.0-windows</TargetFramework>
+  <Nullable>enable</Nullable>
+  <ImplicitUsings>enable</ImplicitUsings>
+  <UseWPF>true</UseWPF>
+  <Platforms>AnyCPU;x64</Platforms>
+  <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+  <ApplicationIcon>Resources\twm_installer.ico</ApplicationIcon>
+</PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\twm_installer.ico" />
+    <None Remove="Runtime\MicrosoftEdgeWebview2Setup.exe" />
+  </ItemGroup>
+
+  <ItemGroup>
+	  <EmbeddedResource Include="Runtime\MicrosoftEdgeWebView2Setup.exe"
+					LogicalName="TWM.Installer.Runtime.MicrosoftEdgeWebView2Setup.exe" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\twm_installer.ico" />
+  </ItemGroup>
+
+</Project>
