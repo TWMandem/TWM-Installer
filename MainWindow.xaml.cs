@@ -7,7 +7,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -22,8 +21,13 @@ namespace TWM.Installer;
 
 public partial class MainWindow : Window
 {
-    private const string GitHubLatestReleaseApiUrl =
-        "https://api.github.com/repos/TWMandem/TWM-Launcher/releases/latest";
+    // Публичный репозиторий только для готовых релизов.
+    // API GitHub не используется, поэтому установщик не зависит от API rate limit.
+    private const string LatestManifestUrl =
+        "https://github.com/TWMandem/TWM-Launcher-Releases/releases/latest/download/latest.json";
+
+    private const string PackageDownloadBaseUrl =
+        "https://github.com/TWMandem/TWM-Launcher-Releases/releases/latest/download/";
 
     private const string ReleaseManifestAssetName = "latest.json";
     private const string DefaultPackageAssetName = "TWM.Launcher.Package.zip";
@@ -770,9 +774,6 @@ public partial class MainWindow : Window
             Timeout = TimeSpan.FromMinutes(15)
         };
         client.DefaultRequestHeaders.UserAgent.ParseAdd("TWM-Installer/1.0");
-        client.DefaultRequestHeaders.Accept.Add(
-            new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
-        client.DefaultRequestHeaders.Add("X-GitHub-Api-Version", "2022-11-28");
         return client;
     }
 
@@ -780,38 +781,14 @@ public partial class MainWindow : Window
         string temporaryDirectory,
         IProgress<InstallProgress> progress)
     {
-        using var releaseResponse = await GitHubHttpClient.GetAsync(
-            GitHubLatestReleaseApiUrl,
-            HttpCompletionOption.ResponseHeadersRead);
-        releaseResponse.EnsureSuccessStatusCode();
+        // latest.json — статический файл в публичном репозитории релизов.
+        // Не используем api.github.com: анонимные API-запросы имеют rate limit.
+        progress.Report(new InstallProgress(
+            "Получение информации о последней версии...",
+            3));
 
-        await using var releaseStream = await releaseResponse.Content.ReadAsStreamAsync();
-        using var releaseDocument = await JsonDocument.ParseAsync(releaseStream);
-
-        if (!releaseDocument.RootElement.TryGetProperty("assets", out var assetsElement) ||
-            assetsElement.ValueKind != JsonValueKind.Array)
-        {
-            throw new InvalidDataException(
-                "GitHub Releases не вернул список файлов релиза.");
-        }
-
-        var assets = assetsElement.EnumerateArray()
-            .Where(asset => asset.TryGetProperty("name", out _))
-            .ToDictionary(
-                asset => asset.GetProperty("name").GetString() ?? string.Empty,
-                asset => asset,
-                StringComparer.OrdinalIgnoreCase);
-
-        if (!assets.TryGetValue(ReleaseManifestAssetName, out var manifestAsset))
-        {
-            throw new InvalidDataException(
-                $"В последнем стабильном релизе отсутствует {ReleaseManifestAssetName}. " +
-                "Релиз должен быть опубликован через TWM-Launcher-Publisher.");
-        }
-
-        string manifestUrl = GetAssetDownloadUrl(manifestAsset, ReleaseManifestAssetName);
         using var manifestResponse = await GitHubHttpClient.GetAsync(
-            manifestUrl,
+            LatestManifestUrl,
             HttpCompletionOption.ResponseHeadersRead);
         manifestResponse.EnsureSuccessStatusCode();
 
@@ -821,6 +798,7 @@ public partial class MainWindow : Window
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
         if (releaseManifest == null ||
+            string.IsNullOrWhiteSpace(releaseManifest.PackageVersion) ||
             string.IsNullOrWhiteSpace(releaseManifest.PackageFile) ||
             string.IsNullOrWhiteSpace(releaseManifest.Sha256) ||
             !Regex.IsMatch(releaseManifest.Sha256, @"\A[0-9a-fA-F]{64}\z"))
@@ -830,22 +808,23 @@ public partial class MainWindow : Window
                 "Ожидаются packageVersion, packageFile и sha256.");
         }
 
-        string packageFile = Path.GetFileName(releaseManifest.PackageFile);
-        if (!string.Equals(packageFile, releaseManifest.PackageFile, StringComparison.Ordinal) ||
-            !string.Equals(packageFile, DefaultPackageAssetName, StringComparison.OrdinalIgnoreCase))
+        // Запрещаем пути и произвольные имена из манифеста.
+        // Установщик должен загружать только ожидаемый ZIP-пакет.
+        if (!string.Equals(
+                releaseManifest.PackageFile,
+                DefaultPackageAssetName,
+                StringComparison.Ordinal))
         {
             throw new InvalidDataException(
                 $"Недопустимое имя пакета в манифесте: {releaseManifest.PackageFile}");
         }
 
-        if (!assets.TryGetValue(packageFile, out var packageAsset))
-        {
-            throw new InvalidDataException(
-                $"В последнем стабильном релизе отсутствует пакет {packageFile}.");
-        }
+        string packageUrl = PackageDownloadBaseUrl + DefaultPackageAssetName;
+        string packagePath = Path.Combine(temporaryDirectory, DefaultPackageAssetName);
 
-        string packageUrl = GetAssetDownloadUrl(packageAsset, packageFile);
-        string packagePath = Path.Combine(temporaryDirectory, packageFile);
+        progress.Report(new InstallProgress(
+            $"Загрузка TWM Launcher {releaseManifest.PackageVersion}...",
+            4));
 
         using var packageResponse = await GitHubHttpClient.GetAsync(
             packageUrl,
@@ -872,8 +851,8 @@ public partial class MainWindow : Window
                 totalRead += read;
 
                 int percent = contentLength is > 0
-                    ? 3 + (int)Math.Min(15, totalRead * 15d / contentLength.Value)
-                    : 3;
+                    ? 4 + (int)Math.Min(14, totalRead * 14d / contentLength.Value)
+                    : 4;
                 string sizeText = contentLength is > 0
                     ? $"{FormatBytes(totalRead)} из {FormatBytes(contentLength.Value)}"
                     : FormatBytes(totalRead);
@@ -881,6 +860,15 @@ public partial class MainWindow : Window
                     $"Загрузка пакета TWM Launcher: {sizeText}",
                     percent));
             }
+        }
+
+        // Если сервер передал размер, убеждаемся, что загрузка полная.
+        if (contentLength is > 0 && new FileInfo(packagePath).Length != contentLength.Value)
+        {
+            try { File.Delete(packagePath); } catch { }
+            throw new InvalidDataException(
+                "Размер загруженного пакета не совпадает с Content-Length. " +
+                "Проверь подключение к интернету и повтори попытку.");
         }
 
         string actualPackageHash;
@@ -901,32 +889,10 @@ public partial class MainWindow : Window
         }
 
         progress.Report(new InstallProgress(
-            $"Пакет {releaseManifest.PackageVersion ?? ""} загружен и проверен.",
+            $"Пакет {releaseManifest.PackageVersion} загружен и проверен.",
             19));
 
         return packagePath;
-    }
-
-    private static string GetAssetDownloadUrl(JsonElement asset, string assetName)
-    {
-        if (!asset.TryGetProperty("browser_download_url", out var urlElement))
-        {
-            throw new InvalidDataException(
-                $"Не удалось получить ссылку на файл релиза {assetName}.");
-        }
-
-        string? url = urlElement.GetString();
-        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) ||
-            uri.Scheme != Uri.UriSchemeHttps ||
-            (!string.Equals(uri.Host, "github.com", StringComparison.OrdinalIgnoreCase) &&
-             !string.Equals(uri.Host, "objects.githubusercontent.com", StringComparison.OrdinalIgnoreCase) &&
-             !string.Equals(uri.Host, "release-assets.githubusercontent.com", StringComparison.OrdinalIgnoreCase)))
-        {
-            throw new InvalidDataException(
-                $"GitHub вернул недопустимую ссылку на {assetName}.");
-        }
-
-        return uri.AbsoluteUri;
     }
 
     private static string FormatBytes(long bytes)
